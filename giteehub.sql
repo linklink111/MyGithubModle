@@ -180,5 +180,106 @@ create table issue_labels(
 	issue_id int references issues(id)
 )
 
+-- 一些常用的查询语句, 有需要可以修改参数进行查询
 
+-- 1. 查询今天最多的 commit 来自哪个地区
+select u.country_code, count(*) 
+from commits c, users u
+where c.author_id = u.id 
+and date(c.created_at) = date(now())
+group by u.country_code
 
+-- 2.查询最近三个月最活跃的组织
+select distinct(u.login) as login
+	from commits c, users u, project_commits pc, users u1, project p
+	where u.id = c.committer_id
+		and u.fake is false
+      	and pc.commit_id = c.id
+      	and pc.project_id = p.id
+      	and p.owner_id = u1.id
+      	and p.name = 'rails'
+      	and u1.login = 'rails'
+      	and c.created_at > DATE_SUB(NOW(), INTERVAL 3 MONTH)
+union
+select distinct(u.login) as login
+  from pull_requests pr, projects p, users u, users u1, pull_request_history prh
+  where u.id = prh.actor_id
+    and prh.action = 'merged'
+    and u1.id = p.owner_id
+    and prh.pull_request_id = pr.id
+    and pr.base_repo_id = p.id
+    and prh.created_at > DATE_SUB(NOW(), INTERVAL 3 MONTH)
+    and p.name = 'rails'
+    and u1.login = 'rails'
+
+-- 查询 Ruby 或 Rails 语言使用的最新计数
+
+select *
+from project_languages
+where project_id = 1334
+order by created_at desc
+
+-- 列出一个仓库所有的commits
+
+select c.*
+from commits c, project_commits pc, projects p, users u
+where u.login = 'rails'
+  and p.name = 'rails'
+  and p.id = pc.project_id
+  and c.id = pc.commit_id
+order by c.created_at desc
+
+-- 查询一个 pull request 中的所有action
+
+select user, action, created_at from
+(
+  select prh.action as action, prh.created_at as created_at, u.login as user
+  from pull_request_history prh, users u
+  where prh.pull_request_id = ?
+    and prh.actor_id = u.id
+  union
+  select ie.action as action, ie.created_at as created_at, u.login as user
+  from issues i, issue_events ie, users u
+  where ie.issue_id = i.id
+    and i.pull_request_id = ?
+    and ie.actor_id = u.id
+  union
+  select 'discussed' as action, ic.created_at as created_at, u.login as user
+  from issues i, issue_comments ic, users u
+  where ic.issue_id = i.id
+    and u.id = ic.user_id
+    and i.pull_request_id = ?
+  union
+  select 'reviewed' as action, prc.created_at as created_at, u.login as user
+  from pull_request_comments prc, users u
+  where prc.user_id = u.id
+    and prc.pull_request_id = ?
+) as actions
+order by created_at;
+
+-- 获取一个 issue 或 pull request 的所有参与者
+
+select distinct(user_id) from
+(
+  select user_id
+  from pull_request_comments
+  where pull_request_id = ?
+  union
+  select user_id
+  from issue_comments ic, issues i
+  where i.id = ic.issue_id and i.pull_request_id = ?
+) as participants
+
+-- 获取一天内 NL 国家提交 java 项目 commit 的用户
+
+select u.login
+from users u, commits c, projects p, project_commits pc
+where date(c.created_at) = date(now())
+and pc.commit_id = c.id
+and c.author_id = u.id
+and u.country_code = 'nl'
+and 'java' = (select pl.language
+              from project_langauges pl
+              where pl.project_id = p.id
+              order by pl.created_at desc, pl.bytes desc
+              limit 1)
