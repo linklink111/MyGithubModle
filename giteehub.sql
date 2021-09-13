@@ -270,7 +270,7 @@ select distinct(user_id) from
   where i.id = ic.issue_id and i.pull_request_id = ?
 ) as participants
 
--- 获取一天内 NL 国家提交 java 项目 commit 的用户
+-- 获取一天内 NL 国家提交了 java 项目 commit 的用户
 
 select u.login
 from users u, commits c, projects p, project_commits pc
