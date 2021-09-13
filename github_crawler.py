@@ -24,6 +24,7 @@ print(sql_data)
 
 db_name = "giteehub"
 user = "postgres"
+port = 5432
 print(secret_data['password'])
 mpassword = secret_data['password']
 db_conn = psycopg2.connect(
@@ -31,7 +32,7 @@ db_conn = psycopg2.connect(
     user = "postgres", 
     password = mpassword, 
     host = "127.0.0.1", 
-    port = "1062")
+    port = port)
 
 # 用游标执行数据库操作
 
@@ -42,6 +43,6 @@ try:
     cursor.execute(sql_data['testInsert'])
     db_conn.commit()
     db_conn.close()
-except Exception:
-    print(Exception)
+except Exception as e:
+    print(e)
 

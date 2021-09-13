@@ -1,1 +1,1 @@
-testInsert: "INSERT INTO user VALUES (1,'mega','mega','tju','787624675@qq.com',null,null,null,null,null,null,null,null,null)"
+testInsert: "INSERT INTO \"user\" VALUES (1,'mega','mega','tju','787624675@qq.com',null,null,null,null,null,null,null,null,null)"
