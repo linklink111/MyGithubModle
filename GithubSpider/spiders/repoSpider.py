@@ -2,8 +2,18 @@ import json
 import scrapy
 import ast
 
-from MyProject.items import UserItem
+from items import UserItem
 
+SPIDER_NAME = None # 初始化为 None， 后续从配置文件获取
+ACCESS_TOKEN = None #
+
+paramKeys = None #
+maxRepoPages = 0
+perPageRepo = 0
+perPageContributors = 0
+maxPagesContributors = 0
+
+execfile("config.py") # 获取配置
 
 @staticmethod
 def unicode_value_escape(value):
