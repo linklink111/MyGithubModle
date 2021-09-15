@@ -1,5 +1,5 @@
 ACCESS_TOKEN = ''
-SPIDER_NAME = 'githubcrawler'
+SPIDER_NAME = 'githubspider'
 paramKeys = [
     {'kw': 'nosql'},
     {'kw': 'b'}

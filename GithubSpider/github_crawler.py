@@ -46,3 +46,6 @@ try:
 except Exception as e:
     print(e)
 
+# 以上部分——连接数据库，已通过单元测试
+
+
