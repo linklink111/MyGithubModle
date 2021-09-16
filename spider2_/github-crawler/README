@@ -1,0 +1,35 @@
+The crawler does the following things
+
+1) Find out the languages in which the person has written the code
+2) Find out the number of owned repositories and forked repositories
+3) Find out the number of followers
+4) Calculate the statistics of the repositories
+
+The statistics are calcualtes on the following criteria
+
+1) Number of lines of code
+2) Number of forks, taking in account the statistics of users that have forked the repository
+3) Number of watchers, taking in account the users those who are watching the repository
+
+In case of forked repositories, it checks for user's contribution to the repository 
+by checking whether the pull requests have been accepted or not.
+
+At the end it generates a metric depending on all the values that have been 
+calcualted above.
+
+Usage:
+python github-crawler.py <username>
+e.g.
+python github-crawler.py sachingupta006
+
+Dependancies
+
+install libxml2 from here
+http://www.linuxfromscratch.org/blfs/view/cvs/general/libxml2.html
+
+install libxslt from here
+http://www.linuxfromscratch.org/blfs/view/6.3/general/libxslt.html
+
+sudo apt_get install python2.7-dev
+easy_install --allow-hosts=lxml.de,*.python.org lxml
+easy_install iso8601
