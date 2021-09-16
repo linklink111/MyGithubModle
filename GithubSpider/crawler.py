@@ -79,7 +79,7 @@ class GHCrawler:
 
     #取规定数量个数内容
     def getNumberStory(self,pageStories):
-        f = file("data.txt","w+")
+        f = open("data.txt","w+")
         for story in pageStories:
             print("项目名称："+story[0]+"\n")
             print("项目简介："+story[1]+"\n")
@@ -116,7 +116,7 @@ def getSortOptions(argument):
     }
     return switcher.get(argument, "nothing")
 #自定义爬取个数
-project_number = 20
+project_number = 10
 page_number = project_number/10
 #自定义/量化（0：最流行，1：不流行，2：复刻/克隆最多，3：克隆最少，4：最近更新，5：近期最少更新）
 options = 0
