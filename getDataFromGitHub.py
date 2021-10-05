@@ -17,6 +17,7 @@
 # Libraries #
 #############
 import json
+from requests.models import Response
 import wget
 import time
 import csv
@@ -28,7 +29,8 @@ import math
 #############
 
 URL = "https://api.github.com/search/repositories?q="  # The basic URL to use the GitHub API
-URL1 = "https://github.com/trending/developers?since=monthly"
+# URL1 = "https://github.com/trending/developers?since=monthly"
+URL1 = "https://crawl-github-trending.herokuapp.com/github/trending"
 QUERY = "user:rsain"  # The personalized query (for instance, to get repositories from user 'rsain')
 SUB_QUERIES = ["+created%3A<%3D2021-03-31",
               "+created%3A>%3D2014-01-01"]  # Different sub-queries if you need to collect more than 1000 elements
@@ -94,8 +96,15 @@ def getUrl(url):
 #     if subquery < len(SUB_QUERIES):
 #         print("Sleeping " + str(DELAY_BETWEEN_QUERIES) + " seconds before the new query ...")
 #         time.sleep(DELAY_BETWEEN_QUERIES)
+try:
+    response = requests.get(URL1,timeout = 3)
+    if response.content:
+        data = response.text
+        print(data)
+        # jsonStr = json.loads(response.content)
+        # print(jsonStr)
+except Exception as e:
+    print(e)
 
-data = getUrl(URL1)
-print(data)
 # print("DONE! " + str(countOfRepositories) + " repositories have been processed.")
 # csv_file.close()
