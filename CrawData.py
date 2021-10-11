@@ -93,62 +93,107 @@ cursor = db_conn.cursor()
 # url1 = "https://api.github.com/users/HashLips"
 
 
-user_list = {'HashLips','authelia','waydroid','robertdavidgraham','qier222','Sairyss','Tencent','VickScarlet','lootproject'}
+# user_list = {'HashLips','authelia','waydroid','robertdavidgraham','qier222','Sairyss','Tencent','VickScarlet','lootproject'}
+user_list = {' peng-zhihui',' trailofbits','Snailclimb', 
+'louislam','vuejs','babysor',
+'facebook',
+'fatedier',
+'ossrs',
+'vinta',
+'yt-dlp',
+'ihciah',
+'sdras',
+'Hack-with-Github',
+'anncwb',
+'Python-World',
+'wimpysworld',
+'mattiasgustavsson',
+'apache',
+'donet5',
+'raywenderlich',
+'herosi',
+'alibaba'
+'vuejs'
+}
 
-# for githubuser in user_list:
-#     try:
-#         url1 = "https://api.github.com/users/{}".format(githubuser)
-#         response = requests.get(url1,timeout = 3)
-#         if response.content:
-#             data = response.json()
-#             print(data)
-#             cursor.execute("INSERT INTO \"user\" VALUES ({},'{}','{}','{}','{}','{}','{}',{},{},{},{},{},{},{})".format(data["id"],data["login"],data["name"],data["company"],data["email"],data["created_at"],data["type"],'null','null','null','null','null','null','null'))
-#             db_conn.commit()
-#             # jsonStr = json.loads(response.content)
-#             # print(jsonStr)
-#     except Exception as e:
-#         print(e)
+insert_users = 0
+insert_repo = 0
+
+if insert_users == 1:
+    for githubuser in user_list:
+        try:
+            url1 = "https://api.github.com/users/{}".format(githubuser)
+            response = requests.get(url1,timeout = 3)
+            if response.content:
+                data = response.json()
+                print(data)
+                cursor.execute("INSERT INTO \"user\" VALUES ({},'{}','{}','{}','{}','{}','{}',{},{},{},{},{},{},{})".format(data["id"],data["login"],data["name"].replace("\'","\'\'"),data["company"],data["email"],data["created_at"],data["type"],'null','null','null','null','null','null','null'))
+                db_conn.commit()
+                # jsonStr = json.loads(response.content)
+                # print(jsonStr)
+        except Exception as e:
+            print(e)
 headers={"Authorization":"token "+mtoken}
-for githubuser in user_list:
-    try:
-        url2 = "https://api.github.com/users/{}/repos".format(githubuser)
-        response = requests.get(url2,timeout = 3,headers=headers)
-        if response.content:
-            data = response.json()
-            # break
-            # print(data)   # 好吧，api被限制了
-            # data = json.load(data)
-            # print(data[2])
-            # print(data)
-            for repo in data:                             # id  url own   name des lan creat fork  del  update
-                # print(type(repo))
-                # print(repo["owner"]["id"])
+
+if insert_repo == 1:
+    for githubuser in user_list:
+        try:
+            url2 = "https://api.github.com/users/{}/repos".format(githubuser)
+            response = requests.get(url2,timeout = 3,headers=headers)
+            if response.content:
+                data = response.json()
                 # break
-                # print(repo)
+                # print(data)   # 好吧，api被限制了
+                # data = json.load(data)
+                # print(data[2])
+                # print(data)
+                for repo in data:                             # id  url own   name des lan creat fork  del  update
+                    # print(type(repo))
+                    # print(repo["owner"]["id"])
+                    # break
+                    # print(repo)
+                    # break
+                    # for colv in repo.values():
+                    #     if type(colv) is str:
+                    #         colv = colv.replace("'","''")
+                    db_conn = psycopg2.connect(
+                    database = "giteehub", 
+                    user = "postgres", 
+                    password = mpassword, 
+                    host = "127.0.0.1", 
+                    port = port)
+
+                    des = repo["description"]
+                    if repo["description"] is not None:
+                        des = repo["description"].replace("\'","\'\'")
+                        print(des)
+                        # repo["description"].replace("`","\`")
+                    try:
+                        # repo = json.loads(repo)                  # id  url own   name des lan creat fork  del  update
+                        cursor.execute("INSERT INTO project VALUES ({},'{}', {},'{}','{}','{}','{}', {},  {},  '{}'  )".format(repo["id"],repo["url"],repo["owner"]["id"],repo["name"],des,repo["language"],repo["created_at"],'null','null',repo["updated_at"]))
+                    except psycopg2.IntegrityError:
+                        db_conn.rollback()
+                    else:
+                        db_conn.commit()
+                    db_conn.close()
+                    # db_conn.close()
+                    # break
                 # break
-                # for colv in repo.values():
-                #     if type(colv) is str:
-                #         colv = colv.replace("'","''")
-                des = repo["description"]
-                if repo["description"] is not None:
-                    des = repo["description"].replace("\'","\'\'")
-                    print(des)
-                    # repo["description"].replace("`","\`")
-                try:
-                    # repo = json.loads(repo)                  # id  url own   name des lan creat fork  del  update
-                    cursor.execute("INSERT INTO project VALUES ({},'{}', {},'{}','{}','{}','{}', {},  {},  '{}'  )".format(repo["id"],repo["url"],repo["owner"]["id"],repo["name"],des,repo["language"],repo["created_at"],'null','null',repo["updated_at"]))
-                except psycopg2.IntegrityError:
-                    db_conn.rollback()
-                else:
-                    db_conn.commit()
-                # db_conn.close()
-                # break
-            # break
-            # jsonStr = json.loads(response.content)
-            # print(jsonStr)
-    except Exception as e:
-        print(e)
+                # jsonStr = json.loads(response.content)
+                # print(jsonStr)
+        except Exception as e:
+            print(e)
 
 
 # data1_ = json.loads(data1)
 # print(data1_)
+
+from github import Github
+# using an access token
+# g = Github("access_token")
+# using an access token
+g = Github(mtoken)  # token
+
+
+
+
